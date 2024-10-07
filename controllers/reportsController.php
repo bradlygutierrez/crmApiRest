@@ -1,5 +1,5 @@
 <?php
-require_once '../models/reports.php';
+require_once __DIR__ . '/../models/reports.php';
 
 class GestorReportesController {
     public function generarReporteVentas() {

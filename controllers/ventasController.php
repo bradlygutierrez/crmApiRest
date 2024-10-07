@@ -1,5 +1,5 @@
 <?php
-require_once '../models/ventas.php';
+require_once __DIR__ . '/../models/ventas.php';
 
 class VentaController {
     public function listarVentas() {

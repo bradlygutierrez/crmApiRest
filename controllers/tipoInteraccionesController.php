@@ -1,5 +1,5 @@
 <?php
-require_once '../models/tipoInteracciones.php';
+require_once __DIR__ . '/../models/tipoInteracciones.php';
 
 class TipoInteraccionController {
     public function listarTiposInteraccion() {

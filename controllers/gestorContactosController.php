@@ -1,7 +1,7 @@
 <?php
 
-require_once '../models/gestorContactos.php';
-require_once '../config/Database.php';
+require_once __DIR__ . '/../models/gestorContactos.php';
+require_once __DIR__ . '/../config/Database.php';  // Ajusta la ruta usando __DIR__
 
 class GestorContactosController {
     

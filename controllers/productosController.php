@@ -1,5 +1,5 @@
 <?php
-require_once '../models/productos.php';
+require_once __DIR__ . '/../models/productos.php';
 
 class ProductoController {
     public function listarProductos() {

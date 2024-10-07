@@ -1,5 +1,5 @@
 <?php
-require_once '../models/clientes.php';
+require_once __DIR__ . '/../models/clientes.php';  
 header('Content-Type: application/json');
 
 
