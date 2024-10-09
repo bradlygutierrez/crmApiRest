@@ -1,10 +1,10 @@
 <?php
 class Database
 {
-    private static $host = "sql3.freesqldatabase.com";  // El host de la base de datos
-    private static $db_name = "sql3735447";  // Cambia esto por el nombre de tu base de datos
-    private static $username = "sql3735447";  // Cambia esto por el usuario de tu base de datos
-    private static $password = "1xdF98jDAc";  // Cambia esto por la contraseña de tu base de datos
+    private static $host = "sql5.freesqldatabase.com";  // El host de la base de datos
+    private static $db_name = "sql5736423";  // Cambia esto por el nombre de tu base de datos
+    private static $username = "sql5736423";  // Cambia esto por el usuario de tu base de datos
+    private static $password = "q5G2DzWIJK";  // Cambia esto por la contraseña de tu base de datos
     private static $conn;
 
     // Método para obtener la conexión a la base de datos

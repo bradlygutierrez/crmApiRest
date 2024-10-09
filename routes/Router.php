@@ -1,17 +1,19 @@
 <?php
 
-class Router {
+class Router
+{
     private $requestUri;
     private $method;
     private $data;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->requestUri = strtok($_SERVER['REQUEST_URI'], '?');
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->data = json_decode(file_get_contents("php://input"), true);
 
         // CORS headers
-        header("Access-Control-Allow-Origin: http://localhost:3000");
+        header("Access-Control-Allow-Origin: http://localhost:3001");
         header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH");
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Credentials: true");
@@ -24,41 +26,55 @@ class Router {
         }
     }
 
-    public function route() {
+    public function route()
+    {
         switch ($this->requestUri) {
-            case '/clientes':
-                $clienteController = new ClienteController();
-                $this->dispatch($clienteController, 'listarClientes', 'registrarCliente');
-                break;
-
-            case '/ventas':
-                $ventaController = new VentaController();
-                $this->dispatch($ventaController, 'listarVentas', 'registrarVenta');
-                break;
-
+            // Rutas para Interacciones
             case '/interacciones':
                 $interaccionController = new InteraccionController();
                 $this->dispatch($interaccionController, 'listarInteracciones', 'registrarInteraccion');
                 break;
 
-            case '/productos':
-                $productoController = new ProductoController();
-                $this->dispatch($productoController, 'listarProductos', 'registrarProducto');
+            // Rutas para Citas
+            case '/citas':
+                $citaController = new CitaController();
+                $this->dispatch($citaController, 'listarCitas', 'registrarCita');
                 break;
 
-            case '/tipo_interacciones':
-                $tipoInteraccionController = new TipoInteraccionController();
-                $this->dispatch($tipoInteraccionController, 'listarTiposInteraccion', null);
+            // Rutas para Usuarios
+            case '/usuarios':
+                $usuarioController = new UsuarioController();
+                $this->dispatch($usuarioController, 'listarUsuarios', 'registrarUsuario');
                 break;
 
-            case '/gestor_reportes':
-                $gestorReportesController = new GestorReportesController();
-                $this->dispatchReports($gestorReportesController);
+            // Rutas para Pacientes
+            case '/pacientes':
+                $pacienteController = new PacienteController();
+                $this->dispatch($pacienteController, 'listarPacientes', 'registrarPaciente');
                 break;
 
-            case '/gestor_contactos':
-                $gestorContactosController = new GestorContactosController();
-                $this->dispatchContactos($gestorContactosController);
+            // Rutas para Empresas
+            case '/empresas':
+                $empresaController = new EmpresaController();
+                $this->dispatch($empresaController, 'listarEmpresas', 'registrarEmpresa');
+                break;
+
+            // Rutas para Contactos
+            case '/contactos':
+                $contactoController = new ContactoController();
+                $this->dispatch($contactoController, 'listarContactos', 'registrarContacto');
+                break;
+
+            // Rutas para Servicios
+            case '/servicios':
+                $servicioController = new ServicioController();
+                $this->dispatch($servicioController, 'listarServicios', 'registrarServicio');
+                break;
+
+            // Rutas para Formularios
+            case '/formularios':
+                $formularioController = new FormularioController();
+                $this->dispatch($formularioController, 'listarFormularios', 'registrarFormulario');
                 break;
 
             default:
@@ -68,7 +84,8 @@ class Router {
         }
     }
 
-    private function dispatch($controller, $getMethod, $postMethod) {
+    private function dispatch($controller, $getMethod, $postMethod)
+    {
         switch ($this->method) {
             case 'GET':
                 if ($getMethod) {
@@ -86,48 +103,20 @@ class Router {
                     echo json_encode(["message" => "Método no permitido"]);
                 }
                 break;
-            default:
-                http_response_code(405);
-                echo json_encode(["message" => "Método no permitido"]);
-                break;
-        }
-    }
-
-    private function dispatchReports($controller) {
-        switch ($this->method) {
-            case 'GET':
-                $action = isset($_GET['action']) ? $_GET['action'] : null;
-                if ($action === 'reporte_ventas') {
-                    $controller->generarReporteVentas();
-                } elseif ($action === 'reporte_clientes') {
-                    $controller->generarReporteClientes();
-                } elseif ($action === 'reporte_inventario') {
-                    $controller->generarReporteInventario();
+            case 'PUT':
+                if (method_exists($controller, 'actualizar')) {
+                    $controller->actualizar($this->data);
                 } else {
-                    http_response_code(404);
-                    echo json_encode(["message" => "Acción no encontrada"]);
+                    http_response_code(405);
+                    echo json_encode(["message" => "Método no permitido"]);
                 }
                 break;
-            default:
-                http_response_code(405);
-                echo json_encode(["message" => "Método no permitido"]);
-                break;
-        }
-    }
-
-    private function dispatchContactos($controller) {
-        switch ($this->method) {
-            case 'POST':
-                $action = isset($_POST['action']) ? $_POST['action'] : null;
-                if ($action === 'programar_seguimiento') {
-                    $controller->programarSeguimiento();
-                } elseif ($action === 'enviar_correo_masivo') {
-                    $controller->enviarCorreoMasivo();
-                } elseif ($action === 'gestionar_campana') {
-                    $controller->gestionarCampania();
+            case 'DELETE':
+                if (method_exists($controller, 'eliminar')) {
+                    $controller->eliminar($this->data);
                 } else {
-                    http_response_code(404);
-                    echo json_encode(["message" => "Acción no encontrada"]);
+                    http_response_code(405);
+                    echo json_encode(["message" => "Método no permitido"]);
                 }
                 break;
             default:
@@ -137,3 +126,4 @@ class Router {
         }
     }
 }
+?>
