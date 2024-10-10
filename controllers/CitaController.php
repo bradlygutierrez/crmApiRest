@@ -4,14 +4,16 @@ header('Content-Type: application/json');
 
 class CitaController
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function listarCitas()
     {
         $cita = new Cita();
         $stmt = $cita->listarCitas();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         if (!empty($result)) {
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
         } else {
@@ -22,11 +24,14 @@ class CitaController
     public function registrarCita($data)
     {
         $cita = new Cita();
-        if ($cita->registrarCita($data)) {
+
+        try {
+            $cita->registrarCita($data); // Llama al método del modelo
             echo json_encode(["message" => "Cita registrada correctamente"]);
-        } else {
-            echo json_encode(["message" => "Error al registrar la cita"]);
+        } catch (Exception $e) {
+            // Manejar el error, retornando el mensaje adecuado
+            echo json_encode(["message" => $e->getMessage()]);
         }
     }
 }
-?>
+

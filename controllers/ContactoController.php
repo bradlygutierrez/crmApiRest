@@ -15,9 +15,20 @@ class ContactoController {
     }
 
     public function registrarContacto($data) {
-        $contacto = new Contacto();
-        $contacto->registrarContacto($data);
-        echo json_encode(["message" => "Contacto registrado"]);
+        try {
+            // Validar que se pasaron los datos necesarios
+            if (!isset($data['nombre_contacto'], $data['email_contacto'], $data['telefono_contacto'], $data['cargo'], $data['nombre_empresa'])) {
+                throw new Exception("Faltan datos requeridos");
+            }
+
+            $contacto = new Contacto();
+            $contacto->registrarContacto($data);
+            echo json_encode(["message" => "Contacto registrado"], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            // Manejo de excepciones
+            http_response_code(400); // Código de error 400 (Bad Request)
+            echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 ?>

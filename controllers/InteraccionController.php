@@ -4,14 +4,16 @@ header('Content-Type: application/json');
 
 class InteraccionController
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function listarInteracciones()
     {
         $interaccion = new Interaccion();
         $stmt = $interaccion->listarInteracciones();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         if (!empty($result)) {
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
         } else {
@@ -22,10 +24,14 @@ class InteraccionController
     public function registrarInteraccion($data)
     {
         $interaccion = new Interaccion();
-        if ($interaccion->registrarInteraccion($data)) {
-            echo json_encode(["message" => "Interacción registrada correctamente"]);
-        } else {
-            echo json_encode(["message" => "Error al registrar la interacción"]);
+        try {
+            if ($interaccion->registrarInteraccion($data)) {
+                echo json_encode(["message" => "Interacción registrada correctamente"]);
+            } else {
+                echo json_encode(["message" => "Error al registrar la interacción"]);
+            }
+        } catch (Exception $e) {
+            echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
         }
     }
 }

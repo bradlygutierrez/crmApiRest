@@ -17,16 +17,23 @@ class Empresa {
     }
 
     public function registrarEmpresa($data) {
-        $query = "INSERT INTO Empresa (nombre_empresa, direccion_empresa, telefono_empresa) 
-                  VALUES (:nombre_empresa, :direccion_empresa, :telefono_empresa)";
+        $query = "INSERT INTO Empresa (nombre_empresa, tipo_empresa, direccion, telefono, email) 
+                  VALUES (:nombre_empresa, :tipo_empresa, :direccion, :telefono, :email)";
         $stmt = $this->conn->prepare($query);
 
         // Binding de parámetros
         $stmt->bindParam(":nombre_empresa", $data['nombre_empresa']);
-        $stmt->bindParam(":direccion_empresa", $data['direccion_empresa']);
-        $stmt->bindParam(":telefono_empresa", $data['telefono_empresa']);
+        $stmt->bindParam(":tipo_empresa", $data['tipo_empresa']);
+        $stmt->bindParam(":direccion", $data['direccion']);
+        $stmt->bindParam(":telefono", $data['telefono']);
+        $stmt->bindParam(":email", $data['email']);
 
-        $stmt->execute();
+        // Ejecutar la consulta y verificar el resultado
+        if ($stmt->execute()) {
+            return true; // Indica que la inserción fue exitosa
+        } else {
+            return false; // Indica que hubo un error
+        }
     }
 }
 ?>

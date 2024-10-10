@@ -19,5 +19,15 @@ class ServicioController {
         $servicio->registrarServicio($data);
         echo json_encode(["message" => "Servicio registrado"]);
     }
+
+    public function actualizarServicio($id_servicio, $data) {
+        $servicio = new Servicio();
+        if ($servicio->actualizarServicio($id_servicio, $data)) {
+            echo json_encode(["message" => "Servicio actualizado correctamente"]);
+        } else {
+            echo json_encode(["message" => "Error al actualizar el servicio"]);
+        }
+    }
+    
 }
 ?>

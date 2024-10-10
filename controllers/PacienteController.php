@@ -29,6 +29,14 @@ class PacienteController
         }
     }
 
-    // Métodos para actualizar, obtener y otros...
+    // Método para actualizar un paciente
+    public function actualizarPaciente($id_paciente, $data)
+    {
+        $paciente = new Paciente();
+        if ($paciente->editarPaciente($id_paciente, $data)) {
+            echo json_encode(["message" => "Paciente actualizado correctamente"]);
+        } else {
+            echo json_encode(["message" => "Error al actualizar paciente"]);
+        }
+    }
 }
-?>

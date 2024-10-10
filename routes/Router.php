@@ -32,60 +32,54 @@ class Router
             // Rutas para Interacciones
             case '/interacciones':
                 $interaccionController = new InteraccionController();
-                $this->dispatch($interaccionController, 'listarInteracciones', 'registrarInteraccion');
+                $this->handleInteracciones($interaccionController);
                 break;
 
             // Rutas para Citas
             case '/citas':
                 $citaController = new CitaController();
-                $this->dispatch($citaController, 'listarCitas', 'registrarCita');
+                $this->handleCitas($citaController);
                 break;
 
             // Rutas para Usuarios
             case '/usuarios':
                 $usuarioController = new UsuarioController();
-                $this->dispatch($usuarioController, 'listarUsuarios', 'registrarUsuario');
+                $this->handleUsuarios($usuarioController);
                 break;
 
             // Rutas para Pacientes
             case '/pacientes':
                 $pacienteController = new PacienteController();
-                $this->dispatch($pacienteController, 'listarPacientes', 'registrarPaciente');
-                break;
-
-            // Rutas para Empresas
-            case '/empresas':
-                $empresaController = new EmpresaController();
-                $this->dispatch($empresaController, 'listarEmpresas', 'registrarEmpresa');
-                break;
-
-            // Rutas para Contactos
-            case '/contactos':
-                $contactoController = new ContactoController();
-                $this->dispatch($contactoController, 'listarContactos', 'registrarContacto');
+                $this->handlePacientes($pacienteController);
                 break;
 
             // Rutas para Servicios
             case '/servicios':
                 $servicioController = new ServicioController();
-                $this->dispatch($servicioController, 'listarServicios', 'registrarServicio');
+                $this->handleServicios($servicioController);
                 break;
 
-            // Rutas para Formularios
+            // Rutas para Empresas
+            case '/empresas':
+                $empresaController = new EmpresaController();
+                $this->handleEmpresas($empresaController);
+                break;
+
             case '/formularios':
                 $formularioController = new FormularioController();
-                $this->dispatch($formularioController, 'listarFormularios', 'registrarFormulario');
+                $this->handleFormularios($formularioController);
+                break;
+
+            // Rutas para Contactos
+            case '/contactos':
+                $contactoController = new ContactoController(); // Asegúrate de que este controlador exista
+                $this->handleContactos($contactoController);
                 break;
 
             // Ruta de Login
             case '/login':
                 $usuarioController = new UsuarioController();
-                if ($this->method === 'POST') {
-                    $usuarioController->loginUsuario($this->data);
-                } else {
-                    http_response_code(405);
-                    echo json_encode(["message" => "Método no permitido"]);
-                }
+                $this->handleLogin($usuarioController);
                 break;
 
             default:
@@ -95,40 +89,157 @@ class Router
         }
     }
 
-    private function dispatch($controller, $getMethod, $postMethod)
+    private function handleInteracciones($controller)
     {
         switch ($this->method) {
             case 'GET':
-                if ($getMethod) {
-                    $controller->$getMethod();
-                } else {
-                    http_response_code(405);
-                    echo json_encode(["message" => "Método no permitido"]);
-                }
+                $controller->listarInteracciones();
                 break;
             case 'POST':
-                if ($postMethod) {
-                    $controller->$postMethod($this->data);
-                } else {
-                    http_response_code(405);
-                    echo json_encode(["message" => "Método no permitido"]);
-                }
+                $controller->registrarInteraccion($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleCitas($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarCitas();
+                break;
+            case 'POST':
+                $controller->registrarCita($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleFormularios($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarFormularios();
+                break;
+            case 'POST':
+                $controller->registrarFormulario($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleUsuarios($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarUsuarios();
+                break;
+            case 'POST':
+                $controller->registrarUsuario($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handlePacientes($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarPacientes();
+                break;
+            case 'POST':
+                $controller->registrarPaciente($this->data);
                 break;
             case 'PUT':
-                if (method_exists($controller, 'actualizar')) {
-                    $controller->actualizar($this->data);
+                if (preg_match('/^\/pacientes\/([0-9]+)$/', $this->requestUri, $matches)) {
+                    $id_paciente = $matches[1];
+                    $controller->actualizarPaciente($id_paciente, $this->data);
                 } else {
-                    http_response_code(405);
-                    echo json_encode(["message" => "Método no permitido"]);
+                    http_response_code(404);
+                    echo json_encode(["message" => "Ruta no encontrada"]);
                 }
                 break;
-            case 'DELETE':
-                if (method_exists($controller, 'eliminar')) {
-                    $controller->eliminar($this->data);
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleServicios($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarServicios();
+                break;
+            case 'POST':
+                $controller->registrarServicio($this->data);
+                break;
+            case 'PUT':
+                if (preg_match('/^\/servicios\/([0-9]+)$/', $this->requestUri, $matches)) {
+                    $id_servicio = $matches[1];
+                    $controller->actualizarServicio($id_servicio, $this->data);
                 } else {
-                    http_response_code(405);
-                    echo json_encode(["message" => "Método no permitido"]);
+                    http_response_code(404);
+                    echo json_encode(["message" => "Ruta no encontrada"]);
                 }
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleEmpresas($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarEmpresas();
+                break;
+            case 'POST':
+                $controller->registrarEmpresa($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleContactos($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarContactos();
+                break;
+            case 'POST':
+                $controller->registrarContacto($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleLogin($controller)
+    {
+        switch ($this->method) {
+            case 'POST':
+                $controller->loginUsuario($this->data);
                 break;
             default:
                 http_response_code(405);
