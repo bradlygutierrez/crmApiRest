@@ -22,6 +22,13 @@ class UsuarioController
     public function registrarUsuario($data)
     {
         $usuario = new Usuario();
+
+        // Verificación de campos antes de llamar al método
+        if (!isset($data['nombre_usuario'], $data['email_usuario'], $data['contraseña'], $data['rol'])) {
+            echo json_encode(["message" => "Datos incompletos"], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
         if ($usuario->registrarUsuario($data)) {
             echo json_encode(["message" => "Usuario registrado correctamente"]);
         } else {
@@ -48,4 +55,3 @@ class UsuarioController
         }
     }
 }
-?>

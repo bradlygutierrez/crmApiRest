@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../config/Database.php';
 
 class Usuario
@@ -11,7 +12,7 @@ class Usuario
         $this->conn = $database->getConnection();
     }
 
-    public function listarUsuarios(): mixed
+    public function listarUsuarios()
     {
         $query = "SELECT * FROM Usuario";
         $stmt = $this->conn->prepare($query);
@@ -21,31 +22,42 @@ class Usuario
 
     public function registrarUsuario($data)
     {
+        // Verificamos que todos los datos requeridos están presentes
+        if (!isset($data['nombre_usuario'], $data['email_usuario'], $data['contraseña'], $data['rol'])) {
+            return false;
+        }
+
+        // Asignamos las variables
+        $nombre_usuario = $data['nombre_usuario'];
+        $email_usuario = $data['email_usuario'];
+        $contraseña = $data['contraseña'];
+        $rol = $data['rol'];
+
+        // Preparamos la consulta SQL para insertar el usuario
         $query = "INSERT INTO Usuario (nombre_usuario, email_usuario, contraseña, rol) 
-                  VALUES (:nombre_usuario, :email_usuario, :contraseña, :rol)";
+                  VALUES (?, ?, ?, ?)";
+
         $stmt = $this->conn->prepare($query);
-        
-        $stmt->bindParam(":nombre_usuario", $data['nombre_usuario']);
-        $stmt->bindParam(":email_usuario", $data['email_usuario']);
-        $stmt->bindParam(":contraseña", $data['contraseña']);
-        $stmt->bindParam(":rol", $data['rol']);
-        
-        return $stmt->execute();
+
+        // Ejecutamos la consulta con los datos proporcionados
+        if ($stmt->execute([$nombre_usuario, $email_usuario, $contraseña, $rol])) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public function autenticarUsuario($email, $password)
+    public function autenticarUsuario($email, $contraseña)
     {
-        $query = "SELECT * FROM Usuario WHERE email_usuario = :email";
+        $query = "SELECT * FROM Usuario WHERE email_usuario = ? AND contraseña = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":email", $email);
-        $stmt->execute();
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute([$email, $contraseña]);
 
-        if ($usuario && $usuario['contraseña'] === $password) {
-            return $usuario; // Retorna los datos del usuario si coincide la contraseña
+        // Verificamos si el usuario existe
+        if ($stmt->rowCount() > 0) {
+            return $stmt->fetch(PDO::FETCH_ASSOC); // Devolvemos los datos del usuario
         } else {
             return false;
         }
     }
 }
-?>
