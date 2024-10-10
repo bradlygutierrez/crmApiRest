@@ -28,5 +28,24 @@ class UsuarioController
             echo json_encode(["message" => "Error al registrar el usuario"]);
         }
     }
+
+    public function loginUsuario($data)
+    {
+        $usuario = new Usuario();
+        $email = $data['email_usuario'];
+        $password = $data['contraseña'];
+
+        $autenticado = $usuario->autenticarUsuario($email, $password);
+
+        if ($autenticado) {
+            echo json_encode([
+                "message" => "Login exitoso",
+                "usuario" => $autenticado
+            ]);
+        } else {
+            http_response_code(401);
+            echo json_encode(["message" => "Credenciales incorrectas"]);
+        }
+    }
 }
 ?>

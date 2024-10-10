@@ -13,7 +13,7 @@ class Router
         $this->data = json_decode(file_get_contents("php://input"), true);
 
         // CORS headers
-        header("Access-Control-Allow-Origin: http://localhost:3001");
+        header("Access-Control-Allow-Origin: http://localhost:3000");
         header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH");
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Credentials: true");
@@ -75,6 +75,17 @@ class Router
             case '/formularios':
                 $formularioController = new FormularioController();
                 $this->dispatch($formularioController, 'listarFormularios', 'registrarFormulario');
+                break;
+
+            // Ruta de Login
+            case '/login':
+                $usuarioController = new UsuarioController();
+                if ($this->method === 'POST') {
+                    $usuarioController->loginUsuario($this->data);
+                } else {
+                    http_response_code(405);
+                    echo json_encode(["message" => "Método no permitido"]);
+                }
                 break;
 
             default:

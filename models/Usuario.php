@@ -21,16 +21,31 @@ class Usuario
 
     public function registrarUsuario($data)
     {
-        $query = "INSERT INTO Usuario (nombre_usuario, email_usuario, password_usuario, telefono_usuario) 
-                  VALUES (:nombre_usuario, :email_usuario, :password_usuario, :telefono_usuario)";
+        $query = "INSERT INTO Usuario (nombre_usuario, email_usuario, contraseña, rol) 
+                  VALUES (:nombre_usuario, :email_usuario, :contraseña, :rol)";
         $stmt = $this->conn->prepare($query);
         
         $stmt->bindParam(":nombre_usuario", $data['nombre_usuario']);
         $stmt->bindParam(":email_usuario", $data['email_usuario']);
-        $stmt->bindParam(":password_usuario", $data['password_usuario']);
-        $stmt->bindParam(":telefono_usuario", $data['telefono_usuario']);
+        $stmt->bindParam(":contraseña", $data['contraseña']);
+        $stmt->bindParam(":rol", $data['rol']);
         
         return $stmt->execute();
+    }
+
+    public function autenticarUsuario($email, $password)
+    {
+        $query = "SELECT * FROM Usuario WHERE email_usuario = :email";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario && $usuario['contraseña'] === $password) {
+            return $usuario; // Retorna los datos del usuario si coincide la contraseña
+        } else {
+            return false;
+        }
     }
 }
 ?>
