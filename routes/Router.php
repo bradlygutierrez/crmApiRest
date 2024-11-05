@@ -65,6 +65,7 @@ class Router
                 $this->handleEmpresas($empresaController);
                 break;
 
+            // Rutas para Formularios
             case '/formularios':
                 $formularioController = new FormularioController();
                 $this->handleFormularios($formularioController);
@@ -72,19 +73,38 @@ class Router
 
             // Rutas para Contactos
             case '/contactos':
-                $contactoController = new ContactoController(); // Asegúrate de que este controlador exista
+                $contactoController = new ContactoController();
                 $this->handleContactos($contactoController);
                 break;
 
-            // Ruta de Login
+            // Ruta para Login
             case '/login':
                 $usuarioController = new UsuarioController();
                 $this->handleLogin($usuarioController);
                 break;
 
+            // Rutas para Tickets de Soporte
+            case '/tickets':
+                $ticketController = new TicketController();
+                $this->handleTickets($ticketController);
+                break;
+
+            // Ruta para actualizar un ticket específico
             default:
-                http_response_code(404);
-                echo json_encode(["message" => "Ruta no encontrada"]);
+                // Verifica si la URL es `/tickets/{id}`
+                if (preg_match('#^/tickets/(\d+)$#', $this->requestUri, $matches)) {
+                    $ticketId = $matches[1];
+                    $ticketController = new TicketController();
+                    if ($this->method === 'PUT') {
+                        $ticketController->actualizarTicket($ticketId, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+                } else {
+                    http_response_code(404);
+                    echo json_encode(["message" => "Ruta no encontrada"]);
+                }
                 break;
         }
     }
@@ -235,6 +255,22 @@ class Router
         }
     }
 
+    private function handleTickets($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarTickets();
+                break;
+            case 'POST':
+                $controller->registrarTicket($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
     private function handleLogin($controller)
     {
         switch ($this->method) {
@@ -248,4 +284,3 @@ class Router
         }
     }
 }
-?>
