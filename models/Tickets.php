@@ -33,16 +33,14 @@ class Ticket
     // Registrar un nuevo ticket
     public function registrarTicket($data)
     {
-        $query = "INSERT INTO TicketSoporte (id_usuario, fecha_ticket, titulo, descripcion, estado) 
-                  VALUES (:id_usuario, :fecha_ticket, :titulo, :descripcion, :estado)";
+        $query = "INSERT INTO TicketSoporte (id_usuario, titulo, descripcion ) 
+                  VALUES (:id_usuario, :titulo, :descripcion)";
         
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":id_usuario", $data['id_usuario']);
-        $stmt->bindParam(":fecha_ticket", $data['fecha_ticket']);
-        $stmt->bindParam(":titulo", $data['titulo']);
++        $stmt->bindParam(":titulo", $data['titulo']);
         $stmt->bindParam(":descripcion", $data['descripcion']);
-        $stmt->bindParam(":estado", $data['estado']);
         
         return $stmt->execute();
     }

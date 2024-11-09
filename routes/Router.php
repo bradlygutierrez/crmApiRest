@@ -83,6 +83,17 @@ class Router
                 $this->handleLogin($usuarioController);
                 break;
 
+            case '/logout':
+                $usuarioController = new UsuarioController();
+                $this->handleLogout($usuarioController);
+                break;
+
+            // Ruta para obtener usuario logeado
+            case '/usuario-logeado':
+                $usuarioController = new UsuarioController();
+                $this->handleObtenerUsuarioLogeado($usuarioController);
+                break;
+
             // Rutas para Tickets de Soporte
             case '/tickets':
                 $ticketController = new TicketController();
@@ -281,6 +292,27 @@ class Router
                 http_response_code(405);
                 echo json_encode(["message" => "Método no permitido"]);
                 break;
+        }
+    }
+
+
+    private function handleLogout($controller)
+    {
+        if ($this->method === 'POST') {
+            $controller->logoutUsuario();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function handleObtenerUsuarioLogeado($controller)
+    {
+        if ($this->method === 'GET') {
+            $controller->obtenerUsuarioLogeado();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
         }
     }
 }

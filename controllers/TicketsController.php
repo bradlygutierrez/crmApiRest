@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Ticket.php';
+require_once __DIR__ . '/../models/Tickets.php';
 header('Content-Type: application/json');
 
 class TicketController

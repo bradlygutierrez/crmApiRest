@@ -9,13 +9,18 @@ class UsuarioController
     public function listarUsuarios()
     {
         $usuario = new Usuario();
-        $stmt = $usuario->listarUsuarios();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        if (!empty($result)) {
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+        $usuarios = $usuario->listarUsuarios();
+
+        if (!empty($usuarios)) {
+            echo json_encode([
+                "success" => true,
+                "data" => $usuarios
+            ], JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(["message" => "No hay usuarios disponibles"], JSON_UNESCAPED_UNICODE);
+            echo json_encode([
+                "success" => false,
+                "message" => "No hay usuarios disponibles"
+            ], JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -23,35 +28,69 @@ class UsuarioController
     {
         $usuario = new Usuario();
 
-        // Verificación de campos antes de llamar al método
         if (!isset($data['nombre_usuario'], $data['email_usuario'], $data['contraseña'], $data['rol'])) {
-            echo json_encode(["message" => "Datos incompletos"], JSON_UNESCAPED_UNICODE);
+            echo json_encode([
+                "success" => false,
+                "message" => "Datos incompletos"
+            ], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        if ($usuario->registrarUsuario($data)) {
-            echo json_encode(["message" => "Usuario registrado correctamente"]);
-        } else {
-            echo json_encode(["message" => "Error al registrar el usuario"]);
-        }
+        $resultado = $usuario->registrarUsuario($data);
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
     }
 
     public function loginUsuario($data)
     {
         $usuario = new Usuario();
+
+        if (!isset($data['email_usuario'], $data['contraseña'])) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Datos de inicio de sesión incompletos"
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
         $email = $data['email_usuario'];
         $password = $data['contraseña'];
+        $resultado = $usuario->autenticarUsuario($email, $password);
 
-        $autenticado = $usuario->autenticarUsuario($email, $password);
-
-        if ($autenticado) {
+        if ($resultado) {
             echo json_encode([
+                "success" => true,
                 "message" => "Login exitoso",
-                "usuario" => $autenticado
-            ]);
+                "usuario" => $_SESSION['username']
+            ], JSON_UNESCAPED_UNICODE);
         } else {
             http_response_code(401);
-            echo json_encode(["message" => "Credenciales incorrectas"]);
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function logoutUsuario()
+    {
+        $usuario = new Usuario();
+        $resultado = $usuario->logoutUsuario();
+
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function obtenerUsuarioLogeado()
+    {
+        $usuario = new Usuario();
+        $resultado = $usuario->obtenerUsuarioLogeado();
+
+        if ($resultado) {
+            echo json_encode([
+                "success" => true,
+                "usuario" => $resultado
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "No hay usuario logeado"
+            ], JSON_UNESCAPED_UNICODE);
         }
     }
 }
