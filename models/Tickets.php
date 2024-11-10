@@ -30,6 +30,20 @@ class Ticket
         return $stmt;
     }
 
+    // Contar tickets pendientes
+    public function contarTicketsPendientes(): int
+    {
+        $query = "SELECT COUNT(*) AS totalPendientes
+                  FROM TicketSoporte
+                  WHERE estado = 'Pendiente'";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['totalPendientes'];
+    }
+
     // Registrar un nuevo ticket
     public function registrarTicket($data)
     {

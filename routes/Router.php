@@ -29,78 +29,94 @@ class Router
     public function route()
     {
         switch ($this->requestUri) {
-            // Rutas para Interacciones
             case '/interacciones':
                 $interaccionController = new InteraccionController();
                 $this->handleInteracciones($interaccionController);
                 break;
 
-            // Rutas para Citas
             case '/citas':
                 $citaController = new CitaController();
                 $this->handleCitas($citaController);
                 break;
 
-            // Rutas para Usuarios
             case '/usuarios':
                 $usuarioController = new UsuarioController();
                 $this->handleUsuarios($usuarioController);
                 break;
 
-            // Rutas para Pacientes
             case '/pacientes':
                 $pacienteController = new PacienteController();
                 $this->handlePacientes($pacienteController);
                 break;
 
-            // Rutas para Servicios
+            case '/pacientes-citas':
+                $pacienteCitaController = new PacienteCitaController();
+                $pacienteCitaController->obtenerPacientesYCitasMesActual();
+                break;
+
+            case '/pacientes-registros':
+                $pacienteRegistroController = new PacienteRegistroController();
+                $pacienteRegistroController->obtenerPacientesPorMes();
+                break;
+
             case '/servicios':
                 $servicioController = new ServicioController();
                 $this->handleServicios($servicioController);
                 break;
 
-            // Rutas para Empresas
             case '/empresas':
                 $empresaController = new EmpresaController();
                 $this->handleEmpresas($empresaController);
                 break;
 
-            // Rutas para Formularios
             case '/formularios':
                 $formularioController = new FormularioController();
                 $this->handleFormularios($formularioController);
                 break;
 
-            // Rutas para Contactos
             case '/contactos':
                 $contactoController = new ContactoController();
                 $this->handleContactos($contactoController);
                 break;
 
-            // Ruta para Login
             case '/login':
                 $usuarioController = new UsuarioController();
                 $this->handleLogin($usuarioController);
                 break;
 
-            // Rutas para Tickets de Soporte
             case '/tickets':
                 $ticketController = new TicketController();
                 $this->handleTickets($ticketController);
                 break;
 
-            // Ruta para actualizar un ticket específico
+            // Ruta para contar pacientes del mes actual
+            case '/pacientes/contar-mes':
+                $pacienteController = new PacienteController();
+                $pacienteController->contarPacientesMesActual(); // Llama al método para contar pacientes del mes
+                break;
+
+            case '/tickets/pendientes': // Nueva ruta para contar tickets pendientes
+                $ticketController = new TicketController();
+                $this->handleTicketsPendientes($ticketController);
+                break;
+            
+            case '/citas/contar':
+                $citaController = new CitaController();
+                $citaController->contarCitasMes(); // Llama al método que cuenta las citas
+                break;
+            case '/pacientes/contar':
+                $pacienteController = new PacienteController();
+                $pacienteController->contarPacientes(); // Llama al método que cuenta los pacientes
+                break;
+
             default:
-                // Verifica si la URL es `/tickets/{id}`
+                // Verifica rutas específicas como /tickets/{id} o /pacientes/{id}
                 if (preg_match('#^/tickets/(\d+)$#', $this->requestUri, $matches)) {
-                    $ticketId = $matches[1];
-                    $ticketController = new TicketController();
-                    if ($this->method === 'PUT') {
-                        $ticketController->actualizarTicket($ticketId, $this->data);
-                    } else {
-                        http_response_code(405);
-                        echo json_encode(["message" => "Método no permitido"]);
-                    }
+                    $this->routeTicketById($matches[1]);
+                } elseif (preg_match('#^/pacientes/(\d+)$#', $this->requestUri, $matches)) {
+                    $this->routePacienteById($matches[1]);
+                } elseif (preg_match('#^/servicios/(\d+)$#', $this->requestUri, $matches)) {
+                    $this->routeServicioById($matches[1]);
                 } else {
                     http_response_code(404);
                     echo json_encode(["message" => "Ruta no encontrada"]);
@@ -108,6 +124,8 @@ class Router
                 break;
         }
     }
+
+    // Métodos para manejar cada tipo de ruta (GET, POST, PUT, etc.)
 
     private function handleInteracciones($controller)
     {
@@ -141,22 +159,6 @@ class Router
         }
     }
 
-    private function handleFormularios($controller)
-    {
-        switch ($this->method) {
-            case 'GET':
-                $controller->listarFormularios();
-                break;
-            case 'POST':
-                $controller->registrarFormulario($this->data);
-                break;
-            default:
-                http_response_code(405);
-                echo json_encode(["message" => "Método no permitido"]);
-                break;
-        }
-    }
-
     private function handleUsuarios($controller)
     {
         switch ($this->method) {
@@ -182,15 +184,6 @@ class Router
             case 'POST':
                 $controller->registrarPaciente($this->data);
                 break;
-            case 'PUT':
-                if (preg_match('/^\/pacientes\/([0-9]+)$/', $this->requestUri, $matches)) {
-                    $id_paciente = $matches[1];
-                    $controller->actualizarPaciente($id_paciente, $this->data);
-                } else {
-                    http_response_code(404);
-                    echo json_encode(["message" => "Ruta no encontrada"]);
-                }
-                break;
             default:
                 http_response_code(405);
                 echo json_encode(["message" => "Método no permitido"]);
@@ -207,15 +200,6 @@ class Router
             case 'POST':
                 $controller->registrarServicio($this->data);
                 break;
-            case 'PUT':
-                if (preg_match('/^\/servicios\/([0-9]+)$/', $this->requestUri, $matches)) {
-                    $id_servicio = $matches[1];
-                    $controller->actualizarServicio($id_servicio, $this->data);
-                } else {
-                    http_response_code(404);
-                    echo json_encode(["message" => "Ruta no encontrada"]);
-                }
-                break;
             default:
                 http_response_code(405);
                 echo json_encode(["message" => "Método no permitido"]);
@@ -231,6 +215,22 @@ class Router
                 break;
             case 'POST':
                 $controller->registrarEmpresa($this->data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
+    private function handleFormularios($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarFormularios();
+                break;
+            case 'POST':
+                $controller->registrarFormulario($this->data);
                 break;
             default:
                 http_response_code(405);
@@ -271,16 +271,57 @@ class Router
         }
     }
 
+    // Nueva función para manejar la ruta de tickets pendientes
+    private function handleTicketsPendientes($controller)
+    {
+        if ($this->method === 'GET') {
+            $controller->obtenerTicketsPendientes();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
     private function handleLogin($controller)
     {
-        switch ($this->method) {
-            case 'POST':
-                $controller->loginUsuario($this->data);
-                break;
-            default:
-                http_response_code(405);
-                echo json_encode(["message" => "Método no permitido"]);
-                break;
+        if ($this->method === 'POST') {
+            $controller->loginUsuario($this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function routeTicketById($id)
+    {
+        $ticketController = new TicketController();
+        if ($this->method === 'PUT') {
+            $ticketController->actualizarTicket($id, $this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function routePacienteById($id)
+    {
+        $pacienteController = new PacienteController();
+        if ($this->method === 'PUT') {
+            $pacienteController->actualizarPaciente($id, $this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function routeServicioById($id)
+    {
+        $servicioController = new ServicioController();
+        if ($this->method === 'PUT') {
+            $servicioController->actualizarServicio($id, $this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
         }
     }
 }

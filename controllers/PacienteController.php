@@ -6,6 +6,15 @@ class PacienteController
 {
     public function __construct() {}
 
+    // Método para contar pacientes del mes actual
+    public function contarPacientesMesActual()
+    {
+        $paciente = new Paciente();
+        $totalPacientesMes = $paciente->contarPacientesMesActual(); // Contamos pacientes del mes actual
+
+        echo json_encode(["total_pacientes_mes" => $totalPacientesMes]); // Respondemos con el total en formato JSON
+    }
+    
     public function listarPacientes()
     {
         $paciente = new Paciente();
@@ -27,6 +36,15 @@ class PacienteController
         } else {
             echo json_encode(["message" => "Error al registrar paciente"]);
         }
+    }
+
+    // Método para contar el número de pacientes
+    public function contarPacientes()
+    {
+        $paciente = new Paciente();
+        $totalPacientes = $paciente->contarPacientes(); // Llamamos al método contarPacientes del modelo
+
+        echo json_encode(["total_pacientes" => $totalPacientes]); // Enviamos el resultado en formato JSON
     }
 
     // Método para actualizar un paciente

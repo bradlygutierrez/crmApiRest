@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Ticket.php';
+require_once __DIR__ . '/../models/Tickets.php';
 header('Content-Type: application/json');
 
 class TicketController
@@ -18,6 +18,15 @@ class TicketController
         } else {
             echo json_encode(["message" => "No hay tickets disponibles"], JSON_UNESCAPED_UNICODE);
         }
+    }
+
+    // Obtener el número de tickets pendientes
+    public function obtenerTicketsPendientes()
+    {
+        $ticket = new Ticket();
+        $totalPendientes = $ticket->contarTicketsPendientes();
+
+        echo json_encode(['totalPendientes' => $totalPendientes]);
     }
 
     // Registrar un nuevo ticket
