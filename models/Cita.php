@@ -79,5 +79,32 @@ class Cita
         // Ejecutar la consulta
         return $stmt->execute();
     }
+
+    public function listarCitasPorUsuario($nombre_paciente): mixed
+    {
+        try {
+            $query = "SELECT 
+                    Cita.id_cita,
+                    Cita.fecha_cita,
+                    Cita.hora_cita,
+                    Cita.estado_cita,
+                    Paciente.nombre_paciente,
+                    Servicio.nombre_servicio,
+                    Servicio.costo_servicio
+                FROM Cita
+                INNER JOIN Paciente ON Cita.id_paciente = Paciente.id_paciente
+                INNER JOIN Servicio ON Cita.id_servicio = Servicio.id_servicio
+                WHERE Paciente.nombre_paciente = :nombre_paciente";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":nombre_paciente", $nombre_paciente, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt;
+        } catch (PDOException $e) {
+            return null; // Handle errors appropriately
+        }
+    }
+
 }
 ?>

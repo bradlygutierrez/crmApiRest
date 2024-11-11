@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 require_once __DIR__ . '/config/Database.php';  // Incluye la conexión a la base de datos
 require_once __DIR__ . '/routes/Router.php';  // Incluye la clase Router

@@ -10,6 +10,7 @@ class Usuario
     {
         $database = new Database();
         $this->conn = $database->getConnection();
+        
     }
 
     public function listarUsuarios()
@@ -56,7 +57,6 @@ class Usuario
             // Verificar la contraseña con password_verify
             if (password_verify($contraseña, $user['contraseña'])) {
                 // Iniciar sesión si la contraseña es correcta
-                session_start();
                 $_SESSION['user_id'] = $user['id_usuario'];
                 $_SESSION['username'] = $user['nombre_usuario'];
                 $_SESSION['email'] = $user['email_usuario'];
@@ -66,13 +66,12 @@ class Usuario
                 return true;
             }
         }
-        
+
         return false; // Usuario no encontrado o contraseña incorrecta
     }
 
     public function logoutUsuario()
     {
-        session_start();
         session_unset();
         session_destroy();
         return true;
@@ -80,7 +79,10 @@ class Usuario
 
     public function obtenerUsuarioLogeado()
     {
-        session_start();
+        // Asegúrate de que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
         // Verificar si el usuario está logeado
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
@@ -94,4 +96,5 @@ class Usuario
 
         return null; // No hay usuario logeado
     }
+
 }

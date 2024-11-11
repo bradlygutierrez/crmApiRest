@@ -1,4 +1,5 @@
 <?php
+// En tu configuración de sesión, asegúrate de que las cookies sean accesibles desde otros dominios
 
 class Router
 {
@@ -13,10 +14,12 @@ class Router
         $this->data = json_decode(file_get_contents("php://input"), true);
 
         // CORS headers
-        header("Access-Control-Allow-Origin: http://localhost:3000");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Origin: http://localhost:3000"); // Permite el origen de tu frontend
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH"); // Métodos permitidos
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, credentials"); // Encabezados permitidos
+        header("Access-Control-Allow-Credentials: true"); // Permitir cookies
+
+        // Permitir el uso de cookies y credenciales
         header('Content-Type: application/json');
 
         // Handle OPTIONS pre-flight requests
@@ -100,14 +103,29 @@ class Router
                 $this->handleTickets($ticketController);
                 break;
 
+            // Ruta para listar tickets por usuario
+            case '/tickets/usuario':
+                $ticketController = new TicketController();
+                $this->handleListarTicketsPorUsuario($ticketController);
+                break;
+            
+            case 'citas/usuario':
+                $citaController = new CitaController(); 
+                $this-> handleListarCitasPorUsuario($citaController);
+                break;
+
             // Ruta para actualizar un ticket específico
             default:
                 // Verifica si la URL es `/tickets/{id}`
                 if (preg_match('#^/tickets/(\d+)$#', $this->requestUri, $matches)) {
                     $ticketId = $matches[1];
                     $ticketController = new TicketController();
-                    if ($this->method === 'PUT') {
-                        $ticketController->actualizarTicket($ticketId, $this->data);
+                
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+                
+                    if ($this->method === 'PATCH') {
+                        $ticketController->cambiarEstadoTicket($ticketId, $this->data);
                     } else {
                         http_response_code(405);
                         echo json_encode(["message" => "Método no permitido"]);
@@ -116,7 +134,8 @@ class Router
                     http_response_code(404);
                     echo json_encode(["message" => "Ruta no encontrada"]);
                 }
-                break;
+                
+
         }
     }
 
@@ -282,6 +301,19 @@ class Router
         }
     }
 
+    private function handleListarTicketsPorUsuario($controller)
+    {
+        switch ($this->method) {
+            case 'GET':
+                $controller->listarTicketsPorUsuario();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+    }
+
     private function handleLogin($controller)
     {
         switch ($this->method) {
@@ -294,7 +326,6 @@ class Router
                 break;
         }
     }
-
 
     private function handleLogout($controller)
     {
@@ -311,6 +342,15 @@ class Router
         if ($this->method === 'GET') {
             $controller->obtenerUsuarioLogeado();
         } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function handleListarCitasPorUsuario($controller){
+        if($this->method === 'GET'){
+            $controller -> listarCitasPorUsuario();
+        }else {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
         }
