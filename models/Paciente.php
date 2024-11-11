@@ -36,7 +36,35 @@ class Paciente
 
         return $stmt->execute();
     }
+    public function contarPacientesMesActual(): int
+    {
+        $currentMonth = date('m'); // Mes actual
+        $currentYear = date('Y');  // Año actual
 
+        // Consulta SQL para contar pacientes registrados en el mes actual
+        $query = "SELECT COUNT(*) AS total FROM Paciente 
+                  WHERE MONTH(fecha_registro) = :currentMonth 
+                  AND YEAR(fecha_registro) = :currentYear";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":currentMonth", $currentMonth, PDO::PARAM_INT);
+        $stmt->bindParam(":currentYear", $currentYear, PDO::PARAM_INT);
+
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return (int) $result['total']; // Retorna el total de pacientes
+    }
+    public function contarPacientes(): int
+    {
+        $query = "SELECT COUNT(*) AS total_pacientes FROM Paciente"; // Ajusta el nombre de la tabla si es necesario
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        // Retorna el número total de pacientes
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) $result['total_pacientes']; // Devuelve el conteo
+    }
 
     public function editarPaciente($id_paciente, $data)
     {

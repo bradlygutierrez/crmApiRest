@@ -12,6 +12,9 @@ require_once __DIR__ . '/controllers/EmpresaController.php';
 require_once __DIR__ . '/controllers/ContactoController.php';
 require_once __DIR__ . '/controllers/ServicioController.php';
 require_once __DIR__ . '/controllers/FormularioController.php';
+require_once __DIR__ . '/controllers/TicketsController.php';
+require_once __DIR__ . '/controllers/PacienteCitaController.php';
+require_once __DIR__ . '/controllers/PacienteRegistroController.php';
 
 // Instancia el enrutador y despacha la solicitud
 $router = new Router();

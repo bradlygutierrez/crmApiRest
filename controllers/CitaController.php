@@ -8,6 +8,12 @@ class CitaController
     {
     }
 
+    public function contarCitasMes()
+    {
+        $cita = new Cita();
+        $totalCitas = $cita->contarCitasMes(); // Llama al método que cuenta las citas del mes
+        echo json_encode(['total_citas_mes' => $totalCitas], JSON_UNESCAPED_UNICODE);
+    }
     public function listarCitas()
     {
         $cita = new Cita();
