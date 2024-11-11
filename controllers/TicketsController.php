@@ -63,6 +63,15 @@ class TicketController
     }
 
 
+    // Obtener el número de tickets pendientes
+    public function obtenerTicketsPendientes()
+    {
+        $ticket = new Ticket();
+        $totalPendientes = $ticket->contarTicketsPendientes();
+
+        echo json_encode(['totalPendientes' => $totalPendientes]);
+    }
+
     // Registrar un nuevo ticket
     public function registrarTicket($data)
     {

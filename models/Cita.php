@@ -10,6 +10,14 @@ class Cita
         $database = new Database();
         $this->conn = $database->getConnection();
     }
+    public function contarCitasMes()
+    {
+        $query = "SELECT COUNT(*) as total_citas_mes FROM Cita WHERE MONTH(fecha_cita) = MONTH(CURRENT_DATE) AND YEAR(fecha_cita) = YEAR(CURRENT_DATE)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total_citas_mes'];
+    }
 
     public function listarCitas(): mixed
     {
