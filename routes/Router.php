@@ -109,10 +109,28 @@ class Router
                 $ticketController = new TicketController();
                 $this->handleListarTicketsPorUsuario($ticketController);
                 break;
-            
+
             case 'citas/usuario':
-                $citaController = new CitaController(); 
-                $this-> handleListarCitasPorUsuario($citaController);
+                $citaController = new CitaController();
+                $this->handleListarCitasPorUsuario($citaController);
+                break;
+
+            case '/pacientes/contar-mes':
+                $pacienteController = new PacienteController();
+                $pacienteController->contarPacientesMesActual(); // Llama al método para contar pacientes del mes
+                break;
+            case '/tickets/pendientes': // Nueva ruta para contar tickets pendientes
+                $ticketController = new TicketController();
+                $this->handleTicketsPendientes($ticketController);
+                break;
+
+            case '/citas/contar':
+                $citaController = new CitaController();
+                $citaController->contarCitasMes(); // Llama al método que cuenta las citas
+                break;
+            case '/pacientes/contar':
+                $pacienteController = new PacienteController();
+                $pacienteController->contarPacientes(); // Llama al método que cuenta los pacientes
                 break;
 
             // Ruta para actualizar un ticket específico
@@ -121,21 +139,22 @@ class Router
                 if (preg_match('#^/tickets/(\d+)$#', $this->requestUri, $matches)) {
                     $ticketId = $matches[1];
                     $ticketController = new TicketController();
-                
+
                     // Decodificar el cuerpo de la solicitud JSON en $this->data
                     $this->data = json_decode(file_get_contents("php://input"), true);
-                
+
                     if ($this->method === 'PATCH') {
                         $ticketController->cambiarEstadoTicket($ticketId, $this->data);
                     } else {
                         http_response_code(405);
                         echo json_encode(["message" => "Método no permitido"]);
                     }
+
                 } else {
                     http_response_code(404);
                     echo json_encode(["message" => "Ruta no encontrada"]);
                 }
-                
+
 
         }
     }
@@ -332,10 +351,52 @@ class Router
         }
     }
 
-    private function handleListarCitasPorUsuario($controller){
-        if($this->method === 'GET'){
-            $controller -> listarCitasPorUsuario();
-        }else {
+    private function handleListarCitasPorUsuario($controller)
+    {
+        if ($this->method === 'GET') {
+            $controller->listarCitasPorUsuario();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function handleTicketsPendientes($controller)
+    {
+        if ($this->method === 'GET') {
+            $controller->obtenerTicketsPendientes();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+
+    private function routeTicketById($id)
+    {
+        $ticketController = new TicketController();
+        if ($this->method === 'PUT') {
+            $ticketController->actualizarTicket($id, $this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+    private function routePacienteById($id)
+    {
+        $pacienteController = new PacienteController();
+        if ($this->method === 'PUT') {
+            $pacienteController->actualizarPaciente($id, $this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+    }
+    private function routeServicioById($id)
+    {
+        $servicioController = new ServicioController();
+        if ($this->method === 'PUT') {
+            $servicioController->actualizarServicio($id, $this->data);
+        } else {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
         }

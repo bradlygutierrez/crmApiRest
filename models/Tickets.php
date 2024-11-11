@@ -22,6 +22,16 @@ class Ticket
             session_start();
         }
     }
+    public function contarTicketsPendientes(): int
+    {
+        $query = "SELECT COUNT(*) AS totalPendientes
+                  FROM TicketSoporte
+                  WHERE estado = 'Pendiente'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['totalPendientes'];
+    }
     // Listar todos los tickets
     public function listarTickets(): mixed
     {

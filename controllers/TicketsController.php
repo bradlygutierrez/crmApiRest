@@ -20,6 +20,7 @@ class TicketController
         }
     }
 
+   
     // Listar todos los tickets
     public function listarTickets()
     {
