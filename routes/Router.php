@@ -42,6 +42,11 @@ class Router
                 $this->handleCitas($citaController);
                 break;
 
+            case '/citas/usuario':
+                $citaController = new CitaController();
+                $this->handleListarCitasPorUsuario($citaController);
+                break;
+
             case '/usuarios':
                 $usuarioController = new UsuarioController();
                 $this->handleUsuarios($usuarioController);
@@ -108,11 +113,6 @@ class Router
             case '/tickets/usuario':
                 $ticketController = new TicketController();
                 $this->handleListarTicketsPorUsuario($ticketController);
-                break;
-
-            case 'citas/usuario':
-                $citaController = new CitaController();
-                $this->handleListarCitasPorUsuario($citaController);
                 break;
 
             case '/pacientes/contar-mes':

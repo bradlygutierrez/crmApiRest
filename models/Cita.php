@@ -44,7 +44,7 @@ class Cita
     public function registrarCita($data)
     {
         // Validar que se pasaron los datos necesarios
-        if (!isset($data['nombre_paciente'], $data['nombre_servicio'], $data['fecha_cita'], $data['hora_cita'], $data['estado_cita'])) {
+        if (!isset($data['nombre_paciente'], $data['nombre_servicio'], $data['fecha_cita'], $data['hora_cita'], $data['estado_cita'], $data['nombre_usuario'])) {
             throw new Exception("Faltan datos requeridos");
         }
 
@@ -60,6 +60,16 @@ class Cita
             throw new Exception("Paciente no encontrado");
         }
 
+        $queryUsuario = "SELECT id_usuario FROM Usuario Where nombre_usuario = :nombre_usuario LIMIT 1";
+        $stmtUsuario = $this->conn->prepare($queryUsuario);
+        $stmtUsuario->bindParam(":nombre_usuario", $data['nombre_usuario']);
+        $stmtUsuario->execute();
+        $usuario = $stmtUsuario->fetch(PDO::FETCH_ASSOC);
+
+        if (!$usuario) {
+            throw new Exception("Usuario no encontrado");
+        }
+
         // Obtener el id del servicio
         $queryServicio = "SELECT id_servicio FROM Servicio WHERE nombre_servicio = :nombre_servicio LIMIT 1";
         $stmtServicio = $this->conn->prepare($queryServicio);
@@ -73,8 +83,8 @@ class Cita
         }
 
         // Ahora que tenemos los IDs, insertamos la nueva cita
-        $query = "INSERT INTO Cita (fecha_cita, hora_cita, estado_cita, id_paciente, id_servicio) 
-                  VALUES (:fecha_cita, :hora_cita, :estado_cita, :id_paciente, :id_servicio)";
+        $query = "INSERT INTO Cita (fecha_cita, hora_cita, estado_cita, id_paciente, id_servicio, id_usuario) 
+                  VALUES (:fecha_cita, :hora_cita, :estado_cita, :id_paciente, :id_servicio, :id_usuario)";
         $stmt = $this->conn->prepare($query);
 
         // Bindear los parámetros
@@ -83,12 +93,15 @@ class Cita
         $stmt->bindParam(":estado_cita", $data['estado_cita']);
         $stmt->bindParam(":id_paciente", $paciente['id_paciente']);
         $stmt->bindParam(":id_servicio", $servicio['id_servicio']);
+        $stmt->bindParam(":id_usuario", $usuario['id_usuario']);
+
+
 
         // Ejecutar la consulta
         return $stmt->execute();
     }
 
-    public function listarCitasPorUsuario($nombre_paciente): mixed
+    public function listarCitasPorUsuario($nombre_usuario): mixed
     {
         try {
             $query = "SELECT 
@@ -98,21 +111,24 @@ class Cita
                     Cita.estado_cita,
                     Paciente.nombre_paciente,
                     Servicio.nombre_servicio,
-                    Servicio.costo_servicio
+                    Servicio.costo_servicio,
+                    Usuario.nombre_usuario
                 FROM Cita
                 INNER JOIN Paciente ON Cita.id_paciente = Paciente.id_paciente
                 INNER JOIN Servicio ON Cita.id_servicio = Servicio.id_servicio
-                WHERE Paciente.nombre_paciente = :nombre_paciente";
+                INNER JOIN Usuario ON Cita.id_usuario = Usuario.id_usuario
+                WHERE Usuario.nombre_usuario = :nombre_usuario";
 
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(":nombre_paciente", $nombre_paciente, PDO::PARAM_STR);
+            $stmt->bindParam(":nombre_usuario", $nombre_usuario, PDO::PARAM_STR);
             $stmt->execute();
 
             return $stmt;
         } catch (PDOException $e) {
-            return null; // Handle errors appropriately
+            return null; // Maneja los errores adecuadamente
         }
     }
+
 
 }
 ?>

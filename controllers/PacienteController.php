@@ -1,10 +1,12 @@
 <?php
-require_once __DIR__ . '/../models/Paciente.php';  
+require_once __DIR__ . '/../models/Paciente.php';
 header('Content-Type: application/json');
 
 class PacienteController
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     // Método para contar pacientes del mes actual
     public function contarPacientesMesActual()
@@ -14,13 +16,13 @@ class PacienteController
 
         echo json_encode(["total_pacientes_mes" => $totalPacientesMes]); // Respondemos con el total en formato JSON
     }
-    
+
     public function listarPacientes()
     {
         $paciente = new Paciente();
         $stmt = $paciente->listarPacientes();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         if (!empty($result)) {
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
         } else {
@@ -30,13 +32,17 @@ class PacienteController
 
     public function registrarPaciente($data)
     {
-        $paciente = new Paciente();
-        if ($paciente->registrarPaciente($data)) {
-            echo json_encode(["message" => "Paciente registrado correctamente"]);
-        } else {
-            echo json_encode(["message" => "Error al registrar paciente"]);
+        try {
+            $paciente = new Paciente();
+            $paciente->registrarPaciente($data);
+            echo json_encode(["message" => "Paciente y usuario registrados correctamente"]);
+        } catch (Exception $e) {
+            echo json_encode(["message" => "Error al registrar paciente o usuario", "error" => $e->getMessage()]);
         }
     }
+
+
+
 
     // Método para contar el número de pacientes
     public function contarPacientes()
