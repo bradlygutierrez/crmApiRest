@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../models/Contacto.php';
 
-class ContactoController {
-    public function listarContactos() {
+class ContactoController
+{
+    public function listarContactos()
+    {
         $contacto = new Contacto();
         $stmt = $contacto->listarContactos();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -14,7 +16,8 @@ class ContactoController {
         }
     }
 
-    public function registrarContacto($data) {
+    public function registrarContacto($data)
+    {
         try {
             // Validar que se pasaron los datos necesarios
             if (!isset($data['nombre_contacto'], $data['email_contacto'], $data['telefono_contacto'], $data['cargo'], $data['nombre_empresa'])) {
@@ -30,5 +33,21 @@ class ContactoController {
             echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    public function modificarContacto($id_contacto, $data)
+    {
+        $contacto = new Contacto();
+
+        try {
+            // Llama al método del modelo para modificar el contacto
+            $contacto->modificarContacto($id_contacto, $data);
+            echo json_encode(["message" => "Contacto modificado correctamente"], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            // Manejar el error, retornando el mensaje adecuado
+            http_response_code(400); // Bad Request
+            echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
 }
 ?>

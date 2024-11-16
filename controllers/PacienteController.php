@@ -24,7 +24,7 @@ class PacienteController
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (!empty($result)) {
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            echo json_encode($result, flags: JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(["message" => "No hay pacientes disponibles"], JSON_UNESCAPED_UNICODE);
         }

@@ -135,7 +135,7 @@ class Router
 
             // Ruta para actualizar un ticket específico
             default:
-                // Verifica rutas específicas como /tickets/{id} o /pacientes/{id}
+                // Verifica rutas específicas como /tickets/{id}, /pacientes/{id}, /servicios/{id}, /citas/{id}, /interacciones/{id}, /empresas/{id} o /contactos/{id}
                 if (preg_match('#^/tickets/(\d+)$#', $this->requestUri, $matches)) {
                     $ticketId = $matches[1];
                     $ticketController = new TicketController();
@@ -150,11 +150,94 @@ class Router
                         echo json_encode(["message" => "Método no permitido"]);
                     }
 
+                } elseif (preg_match('#^/pacientes/(\d+)$#', $this->requestUri, $matches)) {
+                    $pacienteId = $matches[1];
+                    $pacienteController = new PacienteController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $pacienteController->actualizarPaciente($pacienteId, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+
+                } elseif (preg_match('#^/servicios/(\d+)$#', $this->requestUri, $matches)) {
+                    $idServicio = $matches[1];
+                    $servicioController = new ServicioController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $servicioController->actualizarServicio($idServicio, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+
+                } elseif (preg_match('#^/citas/(\d+)$#', $this->requestUri, $matches)) {
+                    $idCita = $matches[1];
+                    $citaController = new CitaController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $citaController->modificarCita($idCita, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+
+                } elseif (preg_match('#^/interacciones/(\d+)$#', $this->requestUri, $matches)) {
+                    $idInteraccion = $matches[1];
+                    $interaccionController = new InteraccionController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $interaccionController->modificarInteraccion($idInteraccion, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+
+                } elseif (preg_match('#^/empresas/(\d+)$#', $this->requestUri, $matches)) {
+                    $idEmpresa = $matches[1];
+                    $empresaController = new EmpresaController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $empresaController->modificarEmpresa($idEmpresa, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+
+                } elseif (preg_match('#^/contactos/(\d+)$#', $this->requestUri, $matches)) {
+                    $idContacto = $matches[1];
+                    $contactoController = new ContactoController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $contactoController->modificarContacto($idContacto, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
+
                 } else {
                     http_response_code(404);
                     echo json_encode(["message" => "Ruta no encontrada"]);
                 }
-
 
         }
     }

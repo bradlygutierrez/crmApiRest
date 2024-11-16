@@ -34,5 +34,21 @@ class InteraccionController
             echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    public function modificarInteraccion($id_interaccion, $data)
+    {
+        $interaccion = new Interaccion();
+
+        try {
+            // Llama al método del modelo para modificar la interacción
+            $interaccion->modificarInteraccion($id_interaccion, $data);
+            echo json_encode(["message" => "Interacción modificada correctamente"], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            // Manejar el error, retornando el mensaje adecuado
+            http_response_code(400); // Bad Request
+            echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
 }
 ?>

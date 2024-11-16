@@ -4,18 +4,18 @@ header('Content-Type: application/json');
 
 class UsuarioController
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function listarUsuarios()
     {
         $usuario = new Usuario();
         $usuarios = $usuario->listarUsuarios();
+        $result = $usuarios->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!empty($usuarios)) {
-            echo json_encode([
-                "success" => true,
-                "data" => $usuarios
-            ], JSON_UNESCAPED_UNICODE);
+        if (!empty($result)) {
+            echo json_encode($result, flags: JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode([
                 "success" => false,

@@ -129,6 +129,67 @@ class Cita
         }
     }
 
+    public function modificarCita($id_cita, $data)
+    {
+        // Validar que se pasaron los datos necesarios
+        if (!isset($data['nombre_paciente'], $data['nombre_servicio'], $data['fecha_cita'], $data['hora_cita'], $data['estado_cita'], $data['nombre_usuario'])) {
+            throw new Exception("Faltan datos requeridos");
+        }
+
+        // Obtener el ID del paciente
+        $queryPaciente = "SELECT id_paciente FROM Paciente WHERE nombre_paciente = :nombre_paciente LIMIT 1";
+        $stmtPaciente = $this->conn->prepare($queryPaciente);
+        $stmtPaciente->bindParam(":nombre_paciente", $data['nombre_paciente']);
+        $stmtPaciente->execute();
+        $paciente = $stmtPaciente->fetch(PDO::FETCH_ASSOC);
+
+        if (!$paciente) {
+            throw new Exception("Paciente no encontrado");
+        }
+
+        // Obtener el ID del usuario
+        $queryUsuario = "SELECT id_usuario FROM Usuario WHERE nombre_usuario = :nombre_usuario LIMIT 1";
+        $stmtUsuario = $this->conn->prepare($queryUsuario);
+        $stmtUsuario->bindParam(":nombre_usuario", $data['nombre_usuario']);
+        $stmtUsuario->execute();
+        $usuario = $stmtUsuario->fetch(PDO::FETCH_ASSOC);
+
+        if (!$usuario) {
+            throw new Exception("Usuario no encontrado");
+        }
+
+        // Obtener el ID del servicio
+        $queryServicio = "SELECT id_servicio FROM Servicio WHERE nombre_servicio = :nombre_servicio LIMIT 1";
+        $stmtServicio = $this->conn->prepare($queryServicio);
+        $stmtServicio->bindParam(":nombre_servicio", $data['nombre_servicio']);
+        $stmtServicio->execute();
+        $servicio = $stmtServicio->fetch(PDO::FETCH_ASSOC);
+
+        if (!$servicio) {
+            throw new Exception("Servicio no encontrado");
+        }
+
+        // Actualizar la cita con los nuevos datos
+        $query = "UPDATE Cita 
+              SET fecha_cita = :fecha_cita, hora_cita = :hora_cita, estado_cita = :estado_cita, id_paciente = :id_paciente, id_servicio = :id_servicio, id_usuario = :id_usuario
+              WHERE id_cita = :id_cita";
+        $stmt = $this->conn->prepare($query);
+
+        // Bindear los parámetros
+        $stmt->bindParam(":fecha_cita", $data['fecha_cita']);
+        $stmt->bindParam(":hora_cita", $data['hora_cita']);
+        $stmt->bindParam(":estado_cita", $data['estado_cita']);
+        $stmt->bindParam(":id_paciente", $paciente['id_paciente']);
+        $stmt->bindParam(":id_servicio", $servicio['id_servicio']);
+        $stmt->bindParam(":id_usuario", $usuario['id_usuario']);
+        $stmt->bindParam(":id_cita", $id_cita, PDO::PARAM_INT);
+
+        // Ejecutar la consulta
+        if (!$stmt->execute()) {
+            throw new Exception("Error al modificar la cita");
+        }
+        return true;
+    }
 
 }
 ?>

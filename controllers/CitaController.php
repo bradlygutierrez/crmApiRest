@@ -69,5 +69,21 @@ class CitaController
             echo json_encode(["message" => "No hay citas disponibles"], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    public function modificarCita($id_cita, $data)
+{
+    $cita = new Cita();
+
+    try {
+        // Llama al método del modelo para modificar la cita
+        $cita->modificarCita($id_cita, $data);
+        echo json_encode(["message" => "Cita modificada correctamente"], JSON_UNESCAPED_UNICODE);
+    } catch (Exception $e) {
+        // Manejar el error, retornando el mensaje adecuado
+        http_response_code(400); // Bad Request
+        echo json_encode(["message" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    }
+}
+
 }
 

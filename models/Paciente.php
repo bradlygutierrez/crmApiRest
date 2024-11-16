@@ -68,13 +68,13 @@ class Paciente
             if (!$stmt->execute()) {
                 $errorInfo = $stmt->errorInfo();
                 $this->conn->rollBack(); // Deshacer la transacción si falla la inserción del paciente
-                echo json_encode(["message" => "Error al registrar paciente", "error" => implode(", ", $errorInfo)]);
+                json_encode(["message" => "Error al registrar paciente", "error" => implode(", ", $errorInfo)]);
                 exit;
             }
 
             // Confirmar la transacción
             $this->conn->commit();
-            echo json_encode(["message" => "Paciente registrado correctamente"]);
+            json_encode(["message" => "Paciente registrado correctamente"]);
             exit;
 
         } catch (PDOException $e) {
