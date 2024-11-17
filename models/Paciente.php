@@ -20,6 +20,26 @@ class Paciente
         $stmt->execute();
         return $stmt;
     }
+    public function obtenerPacientesPendientes()
+    {
+        $query = "SELECT 
+                    p.nombre_paciente, 
+                    MAX(c.fecha_cita) AS ultima_cita, 
+                    DATEDIFF(CURDATE(), MAX(c.fecha_cita)) AS dias_desde_ultima_cita
+                FROM 
+                    Paciente p
+                INNER JOIN 
+                    Cita c ON p.id_paciente = c.id_paciente
+                GROUP BY 
+                    p.id_paciente, p.nombre_paciente
+                HAVING 
+                    dias_desde_ultima_cita >= 30"; // Pacientes con citas hace 30 días o más
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     public function registrarPaciente($data)
     {

@@ -16,7 +16,17 @@ class PacienteController
 
         echo json_encode(["total_pacientes_mes" => $totalPacientesMes]); // Respondemos con el total en formato JSON
     }
+    public function obtenerPacientesPendientes()
+    {
+        $paciente = new Paciente();
+        $result = $paciente->obtenerPacientesPendientes();
 
+        if (!empty($result)) {
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(["message" => "No hay pacientes con chequeos pendientes"], JSON_UNESCAPED_UNICODE);
+        }
+    }
     public function listarPacientes()
     {
         $paciente = new Paciente();

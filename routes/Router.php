@@ -132,7 +132,10 @@ class Router
                 $pacienteController = new PacienteController();
                 $pacienteController->contarPacientes(); // Llama al método que cuenta los pacientes
                 break;
-
+            case '/pacientes/chequeos-pendientes':
+                $pacienteController = new PacienteController();
+                $pacienteController->obtenerPacientesPendientes();
+                break;
             // Ruta para actualizar un ticket específico
             default:
                 // Verifica rutas específicas como /tickets/{id}, /pacientes/{id}, /servicios/{id}, /citas/{id}, /interacciones/{id}, /empresas/{id} o /contactos/{id}
