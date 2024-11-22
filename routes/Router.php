@@ -136,6 +136,10 @@ class Router
                 $pacienteController = new PacienteController();
                 $pacienteController->obtenerPacientesPendientes();
                 break;
+            case '/recuperar-contrasena':
+                $usuarioController = new UsuarioController();
+                $this->handleRecuperarContrasena($usuarioController);
+                break;
             // Ruta para actualizar un ticket específico
             default:
                 // Verifica rutas específicas como /tickets/{id}, /pacientes/{id}, /servicios/{id}, /citas/{id}, /interacciones/{id}, /empresas/{id} o /contactos/{id}
@@ -237,6 +241,19 @@ class Router
                         echo json_encode(["message" => "Método no permitido"]);
                     }
 
+                } elseif (preg_match('#^/usuarios/(\d+)$#', $this->requestUri, $matches)) {
+                    $idUsuario = $matches[1];
+                    $usuarioController = new UsuarioController();
+
+                    // Decodificar el cuerpo de la solicitud JSON en $this->data
+                    $this->data = json_decode(file_get_contents("php://input"), true);
+
+                    if ($this->method === 'PUT') {
+                        $usuarioController->actualizarUsuario($idUsuario, $this->data);
+                    } else {
+                        http_response_code(405);
+                        echo json_encode(["message" => "Método no permitido"]);
+                    }
                 } else {
                     http_response_code(404);
                     echo json_encode(["message" => "Ruta no encontrada"]);
@@ -260,6 +277,17 @@ class Router
                 http_response_code(405);
                 echo json_encode(["message" => "Método no permitido"]);
                 break;
+        }
+    }
+
+    // En el Router
+    private function handleRecuperarContrasena($controller)
+    {
+        if ($this->method === 'POST') {
+            $controller->recuperarContraseña($this->data);
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
         }
     }
 

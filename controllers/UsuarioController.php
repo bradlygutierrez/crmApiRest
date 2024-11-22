@@ -93,4 +93,78 @@ class UsuarioController
             ], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    public function actualizarUsuario($id_usuario, $data)
+    {
+        $usuario = new Usuario();
+
+        // Verificar que el ID del usuario y al menos un campo estén presentes
+        if (empty($id_usuario) || empty($data)) {
+            echo json_encode([
+                "success" => false,
+                "message" => "ID de usuario o datos incompletos"
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $resultado = $usuario->actualizarUsuario($id_usuario, $data);
+
+        if ($resultado) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Usuario actualizado correctamente"
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "Error al actualizar el usuario"
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function recuperarContraseña($data)
+    {
+        if (!isset($data['email'])) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Correo electrónico es requerido."
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        // Instanciar el modelo de Usuario
+        $usuario = new Usuario();
+
+        // Buscar el usuario por correo
+        $usuarioRecuperado = $usuario->obtenerUsuarioPorEmail($data['email']);
+
+        if ($usuarioRecuperado) {
+            // Enviar la contraseña actual al correo del usuario
+            $this->enviarCorreo($data['email'], $usuarioRecuperado['contraseña']);
+
+            echo json_encode([
+                "success" => true,
+                "message" => "Se ha enviado un correo con tu contraseña actual."
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "No se encontró un usuario con ese correo."
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+
+
+    private function enviarCorreo($email, $contraseña)
+    {
+        $asunto = "Tu contraseña actual";
+        $mensaje = "Tu contraseña actual es: $contraseña";
+        $headers = "From: no-reply@CLINMED.com";
+
+        // Usar la función mail() de PHP para enviar el correo
+        mail($email, $asunto, $mensaje, $headers);
+    }
+
+
 }
