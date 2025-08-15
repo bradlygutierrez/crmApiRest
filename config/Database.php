@@ -2,9 +2,9 @@
 class Database
 {
     private static $host = "sql5.freesqldatabase.com";  // El host de la base de datos
-    private static $db_name = "sql5746482";  // Cambia esto por el nombre de tu base de datos
-    private static $username = "sql5746482";  // Cambia esto por el usuario de tu base de datos
-    private static $password = "PmYWKjQYlK";  // Cambia esto por la contraseña de tu base de datos
+    private static $db_name = "sql5795066";  // Cambia esto por el nombre de tu base de datos
+    private static $username = "sql5795066";  // Cambia esto por el usuario de tu base de datos
+    private static $password = "S5XzaER2Vt";  // Cambia esto por la contraseña de tu base de datos
     private static $conn;
 
     // Método para obtener la conexión a la base de datos
